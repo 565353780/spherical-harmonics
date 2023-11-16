@@ -1,4 +1,4 @@
-from spherical_harmonics.Method.render import renderSHFunction
+from spherical_harmonics.Demo.render import demo as demo_render
 
 if __name__ == "__main__":
-    renderSHFunction(1, 1, 'numpy')
+    demo_render()
