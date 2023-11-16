@@ -14,7 +14,11 @@ def renderSHFunction(degree, idx, method_name='math'):
 
     for i in range(theta.shape[0]):
         for j in range(phi.shape[0]):
-            Ylm[i][j] = getSHValue(degree, idx, theta[i], phi[j], method_name)
+            test1 = getSHValue(degree, idx, theta[i], phi[j], 'scipy')
+            test2 = getSHValue(degree, idx, phi[j], theta[i], 'math')
+            print('test values:', test1, test2)
+            Ylm[j][i] = getSHValue(degree, idx, theta[i], phi[j], method_name)
+    exit()
 
     xyz_2d = np.array(
         [

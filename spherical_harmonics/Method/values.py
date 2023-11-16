@@ -125,7 +125,8 @@ def getJittorSHValue(degree, idx, theta, phi):
     return getSHValueWithMethod(degree, idx, theta, phi, jittor)
 
 def getScipySHValue(degree, idx, theta, phi):
-    complex_value = sph_harm(abs(idx), degree, [theta], [phi])
+    complex_value = sph_harm(abs(idx), degree, theta, phi)
+
     if idx < 0:
         return numpy.sqrt(2) * (-1) ** idx * complex_value.imag
     if idx > 0:
@@ -145,4 +146,4 @@ def getSHValue(degree, idx, theta, phi, method_name='math'):
         case 'jittor':
             return getJittorSHValue(degree, idx, theta, phi)
         case 'scipy':
-            return getScipySHValue(idx, degree, theta, phi)
+            return getScipySHValue(degree, idx, theta, phi)
