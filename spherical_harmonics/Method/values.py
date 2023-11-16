@@ -29,7 +29,7 @@ def getWeight(degree, idx):
         case 3:
             return W3[real_idx]
 
-def getValue(degree, idx, theta, phi, method):
+def getValue(degree, idx, phi, theta, method):
     assert isDegreeAndIdxValid(degree, idx)
     match degree:
         case 0:
@@ -105,27 +105,27 @@ def getValue(degree, idx, theta, phi, method):
                     s3p = method.sin(3.0 * phi)
                     return st * st * st * s3p
 
-def getSHValueWithMethod(degree, idx, theta, phi, method):
+def getSHValueWithMethod(degree, idx, phi, theta, method):
     weight = getWeight(degree, idx)
-    value = getValue(degree, idx, theta, phi, method)
+    value = getValue(degree, idx, phi, theta, method)
     assert weight is not None
     assert value is not None
     return weight * value
 
-def getMathSHValue(degree, idx, theta, phi):
-    return getSHValueWithMethod(degree, idx, theta, phi, math)
+def getMathSHValue(degree, idx, phi, theta):
+    return getSHValueWithMethod(degree, idx, phi, theta, math)
 
-def getNumpySHValue(degree, idx, theta, phi):
-    return getSHValueWithMethod(degree, idx, theta, phi, numpy)
+def getNumpySHValue(degree, idx, phi, theta):
+    return getSHValueWithMethod(degree, idx, phi, theta, numpy)
 
-def getTorchSHValue(degree, idx, theta, phi):
-    return getSHValueWithMethod(degree, idx, theta, phi, torch)
+def getTorchSHValue(degree, idx, phi, theta):
+    return getSHValueWithMethod(degree, idx, phi, theta, torch)
 
-def getJittorSHValue(degree, idx, theta, phi):
-    return getSHValueWithMethod(degree, idx, theta, phi, jittor)
+def getJittorSHValue(degree, idx, phi, theta):
+    return getSHValueWithMethod(degree, idx, phi, theta, jittor)
 
-def getScipySHValue(degree, idx, theta, phi):
-    complex_value = sph_harm(abs(idx), degree, theta, phi)
+def getScipySHValue(degree, idx, phi, theta):
+    complex_value = sph_harm(abs(idx), degree, phi, theta)
 
     if idx < 0:
         return numpy.sqrt(2) * (-1) ** idx * complex_value.imag
@@ -133,17 +133,17 @@ def getScipySHValue(degree, idx, theta, phi):
         return numpy.sqrt(2) * (-1) ** idx * complex_value.real
     return complex_value.real
 
-def getSHValue(degree, idx, theta, phi, method_name='math'):
+def getSHValue(degree, idx, phi, theta, method_name='math'):
     assert method_name in ['math', 'numpy', 'torch', 'jittor', 'scipy']
 
     match method_name:
         case 'math':
-            return getMathSHValue(degree, idx, theta, phi)
+            return getMathSHValue(degree, idx, phi, theta)
         case 'numpy':
-            return getNumpySHValue(degree, idx, theta, phi)
+            return getNumpySHValue(degree, idx, phi, theta)
         case 'torch':
-            return getTorchSHValue(degree, idx, theta, phi)
+            return getTorchSHValue(degree, idx, phi, theta)
         case 'jittor':
-            return getJittorSHValue(degree, idx, theta, phi)
+            return getJittorSHValue(degree, idx, phi, theta)
         case 'scipy':
-            return getScipySHValue(degree, idx, theta, phi)
+            return getScipySHValue(degree, idx, phi, theta)

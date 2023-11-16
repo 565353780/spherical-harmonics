@@ -6,29 +6,25 @@ from mpl_toolkits.mplot3d import Axes3D
 from spherical_harmonics.Method.values import getSHValue
 
 def renderSHFunction(degree, idx, method_name='math'):
-    theta = np.linspace(0, 2 * np.pi, 181)
-    phi = np.linspace(0, np.pi, 91)
-    theta_2d, phi_2d = np.meshgrid(theta, phi)
+    phi = np.linspace(0, 2 * np.pi, 181)
+    theta = np.linspace(0, np.pi, 91)
 
-    Ylm = np.zeros(theta_2d.shape, dtype=float)
+    Ylm = np.zeros([phi.shape[0], theta.shape[0]], dtype=float)
 
-    for i in range(theta.shape[0]):
-        for j in range(phi.shape[0]):
-            test1 = getSHValue(degree, idx, theta[i], phi[j], 'scipy')
-            test2 = getSHValue(degree, idx, phi[j], theta[i], 'math')
-            print('test values:', test1, test2)
-            Ylm[j][i] = getSHValue(degree, idx, theta[i], phi[j], method_name)
-    exit()
+    for i in range(phi.shape[0]):
+        for j in range(theta.shape[0]):
+            Ylm[i][j] = getSHValue(degree, idx, phi[i], theta[j], method_name)
 
-    xyz_2d = np.array(
-        [
-            np.sin(phi_2d) * np.sin(theta_2d),
-            np.sin(phi_2d) * np.cos(theta_2d),
-            np.cos(phi_2d),
-        ]
-    )
+    xyz_2d = np.zeros([phi.shape[0], theta.shape[0], 3])
+    for i in range(phi.shape[0]):
+        for j in range(theta.shape[0]):
+            xyz_2d[i][j] = [
+                np.sin(theta[j]) * np.sin(phi[i]),
+                np.sin(theta[j]) * np.cos(phi[i]),
+                np.cos(theta[j]),
+            ]
 
-    r = np.abs(Ylm) * xyz_2d
+    r = np.abs(Ylm) * xyz_2d.transpose(2, 0, 1)
 
 
     colormap = cm.ScalarMappable(cmap=plt.get_cmap("RdYlBu_r"))
