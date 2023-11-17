@@ -147,3 +147,21 @@ def getSHValue(degree, idx, phi, theta, method_name='math'):
             return getJittorSHValue(degree, idx, phi, theta)
         case 'scipy':
             return getScipySHValue(degree, idx, phi, theta)
+
+def getParamIdx(degree, idx):
+    real_idx = idx + degree
+    param_idx = degree**2 + real_idx
+    return param_idx
+
+def getSHModelValue(degree_max, phi, theta, params, method_name):
+    assert len(params) == (degree_max+1)**2
+
+    value = 0
+    for degree in range(degree_max+1):
+        for idx in range(-degree, degree+1, 1):
+            param_idx = getParamIdx(degree, idx)
+            param = params[param_idx]
+            if param == 0:
+                continue
+            value += param * getSHValue(degree, idx, phi, theta, method_name)
+    return value

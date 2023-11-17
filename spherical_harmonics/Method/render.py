@@ -1,11 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
+from functools import partial
 from mpl_toolkits.mplot3d import Axes3D
 
-from spherical_harmonics.Method.values import getSHValue
+from spherical_harmonics.Method.values import getSHModelValue, getSHValue
 
-def renderSHFunction(degree, idx, method_name='math'):
+def renderSHFunction(sh_function):
     phi = np.linspace(0, 2 * np.pi, 181)
     theta = np.linspace(0, np.pi, 91)
 
@@ -13,7 +14,7 @@ def renderSHFunction(degree, idx, method_name='math'):
 
     for i in range(phi.shape[0]):
         for j in range(theta.shape[0]):
-            Ylm[i][j] = getSHValue(degree, idx, phi[i], theta[j], method_name)
+            Ylm[i][j] = sh_function(phi[i], theta[j])
 
     xyz_2d = np.zeros([phi.shape[0], theta.shape[0], 3])
     for i in range(phi.shape[0]):
@@ -25,7 +26,6 @@ def renderSHFunction(degree, idx, method_name='math'):
             ]
 
     r = np.abs(Ylm) * xyz_2d.transpose(2, 0, 1)
-
 
     colormap = cm.ScalarMappable(cmap=plt.get_cmap("RdYlBu_r"))
     colormap.set_clim(-0.5, 0.5)
@@ -45,3 +45,11 @@ def renderSHFunction(degree, idx, method_name='math'):
     ax.set_zlabel("z")
     plt.show()
     return True
+
+def renderSHSurface(degree, idx, method_name='math'):
+    sh_function = partial(getSHValue, degree, idx, method_name=method_name)
+    return renderSHFunction(sh_function)
+
+def renderSHModelSurface(degree_max, params, method_name='math'):
+    sh_function = partial(getSHModelValue, degree_max, params=params, method_name = method_name)
+    return renderSHFunction(sh_function)
