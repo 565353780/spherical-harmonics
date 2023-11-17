@@ -27,10 +27,39 @@ def renderSurface(directions: np.ndarray, values: np.ndarray):
     ax.set_ylabel("y")
     ax.set_zlabel("z")
     plt.show()
+    return True
 
-    return
+def renderBatchSHFunction(sh_function, method_name):
+    phi = np.linspace(0, 2 * np.pi, 181)
+    theta = np.linspace(0, np.pi, 91)
 
-def renderSHFunction(sh_function, method_name):
+    theta_2d, phi_2d = np.meshgrid(theta, phi)
+
+    Ylm = toData(sh_function(
+        toData(phi_2d, method_name),
+        toData(theta_2d, method_name), method_name=method_name),
+        'numpy', np.float64)
+
+    xyz_2d = np.zeros([phi.shape[0], theta.shape[0], 3])
+    for i in range(phi.shape[0]):
+        for j in range(theta.shape[0]):
+            xyz_2d[i][j] = [
+                np.sin(theta[j]) * np.sin(phi[i]),
+                np.sin(theta[j]) * np.cos(phi[i]),
+                np.cos(theta[j]),
+            ]
+
+    if not renderSurface(xyz_2d, Ylm):
+        print('[ERROR][render::renderBatchSHFunction]')
+        print('\t renderSurface failed!')
+        return False
+
+    return True
+
+def renderSHFunction(sh_function, method_name, use_batch=True):
+    if use_batch:
+        return renderBatchSHFunction(sh_function, method_name)
+
     phi = np.linspace(0, 2 * np.pi, 181)
     theta = np.linspace(0, np.pi, 91)
 
