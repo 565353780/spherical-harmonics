@@ -5,8 +5,9 @@ from functools import partial
 from mpl_toolkits.mplot3d import Axes3D
 
 from spherical_harmonics.Method.values import getSHModelValue, getSHValue
+from spherical_harmonics.Method.data import toData
 
-def renderSHFunction(sh_function):
+def renderSHFunction(sh_function, method_name):
     phi = np.linspace(0, 2 * np.pi, 181)
     theta = np.linspace(0, np.pi, 91)
 
@@ -14,7 +15,10 @@ def renderSHFunction(sh_function):
 
     for i in range(phi.shape[0]):
         for j in range(theta.shape[0]):
-            Ylm[i][j] = sh_function(phi[i], theta[j])
+            Ylm[i][j] = toData(sh_function(
+                toData([phi[i]], method_name),
+                toData([theta[j]], method_name), method_name=method_name),
+                'numpy', np.float64)
 
     xyz_2d = np.zeros([phi.shape[0], theta.shape[0], 3])
     for i in range(phi.shape[0]):
@@ -47,9 +51,9 @@ def renderSHFunction(sh_function):
     return True
 
 def renderSHSurface(degree, idx, method_name='math'):
-    sh_function = partial(getSHValue, degree, idx, method_name=method_name)
-    return renderSHFunction(sh_function)
+    sh_function = partial(getSHValue, degree, idx)
+    return renderSHFunction(sh_function, method_name)
 
 def renderSHModelSurface(degree_max, params, method_name='math'):
-    sh_function = partial(getSHModelValue, degree_max, params=params, method_name = method_name)
-    return renderSHFunction(sh_function)
+    sh_function = partial(getSHModelValue, degree_max, params=params)
+    return renderSHFunction(sh_function, method_name)

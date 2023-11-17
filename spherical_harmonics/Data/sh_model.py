@@ -1,8 +1,9 @@
 from spherical_harmonics.Method.render import renderSHModelSurface
 from spherical_harmonics.Method.values import getSHModelValue
+from spherical_harmonics.Method.data import toData
 
 class SHModel(object):
-    def __init__(self, degree_max=0, params=None, method_name='numpy') -> None:
+    def __init__(self, degree_max=0, params=None, method_name='numpy', dtype=None) -> None:
         self.degree_max = degree_max
         if params is None:
             self.params = [0 for _ in range((self.degree_max+1)**2)]
@@ -10,6 +11,9 @@ class SHModel(object):
             self.params = params
             assert len(params) == (self.degree_max+1)**2
         self.method_name = method_name
+        self.dtype = dtype
+
+        self.params = toData(self.params, self.method_name, self.dtype)
         return
 
     def getValue(self, phi, theta):

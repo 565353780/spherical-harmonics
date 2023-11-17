@@ -1,1 +1,0 @@
-from spherical_harmonics.Method.render import renderSHFunction
