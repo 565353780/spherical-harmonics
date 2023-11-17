@@ -7,6 +7,29 @@ from mpl_toolkits.mplot3d import Axes3D
 from spherical_harmonics.Method.values import getSHModelValue, getSHValue
 from spherical_harmonics.Method.data import toData
 
+def renderSurface(directions: np.ndarray, values: np.ndarray):
+    r = np.abs(values) * directions.transpose(2, 0, 1)
+
+    colormap = cm.ScalarMappable(cmap=plt.get_cmap("RdYlBu_r"))
+    colormap.set_clim(-0.5, 0.5)
+    limit = 0.5
+
+    fig = plt.figure(figsize=plt.figaspect(1.0))
+    ax = fig.add_subplot(111, projection="3d")
+    ax.get_proj = lambda: np.dot(Axes3D.get_proj(ax), np.diag([0.75, 0.75, 1, 1]))
+    ax.plot_surface(
+        r[0], r[1], r[2], facecolors=colormap.to_rgba(values), rstride=1, cstride=1
+    )
+    ax.set_xlim(-limit, limit)
+    ax.set_ylim(-limit, limit)
+    ax.set_zlim(-limit, limit)
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    ax.set_zlabel("z")
+    plt.show()
+
+    return
+
 def renderSHFunction(sh_function, method_name):
     phi = np.linspace(0, 2 * np.pi, 181)
     theta = np.linspace(0, np.pi, 91)
@@ -29,25 +52,11 @@ def renderSHFunction(sh_function, method_name):
                 np.cos(theta[j]),
             ]
 
-    r = np.abs(Ylm) * xyz_2d.transpose(2, 0, 1)
+    if not renderSurface(xyz_2d, Ylm):
+        print('[ERROR][render::renderSHFunction]')
+        print('\t renderSurface failed!')
+        return False
 
-    colormap = cm.ScalarMappable(cmap=plt.get_cmap("RdYlBu_r"))
-    colormap.set_clim(-0.5, 0.5)
-    limit = 0.5
-
-    fig = plt.figure(figsize=plt.figaspect(1.0))
-    ax = fig.add_subplot(111, projection="3d")
-    ax.get_proj = lambda: np.dot(Axes3D.get_proj(ax), np.diag([0.75, 0.75, 1, 1]))
-    ax.plot_surface(
-        r[0], r[1], r[2], facecolors=colormap.to_rgba(Ylm.real), rstride=1, cstride=1
-    )
-    ax.set_xlim(-limit, limit)
-    ax.set_ylim(-limit, limit)
-    ax.set_zlim(-limit, limit)
-    ax.set_xlabel("x")
-    ax.set_ylabel("y")
-    ax.set_zlabel("z")
-    plt.show()
     return True
 
 def renderSHSurface(degree, idx, method_name='math'):
