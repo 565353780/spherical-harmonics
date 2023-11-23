@@ -113,7 +113,13 @@ def getSHValueWithMethod(degree, idx, phi, theta, method):
     return weight * value
 
 def getMathSHValue(degree, idx, phi, theta):
-    return getSHValueWithMethod(degree, idx, phi, theta, math)
+    if not isinstance(phi, list):
+        return getSHValueWithMethod(degree, idx, phi, theta, math)
+
+    value_list = []
+    for p, t in zip(phi, theta):
+        value_list.append(getSHValueWithMethod(degree, idx, p, t, math))
+    return value_list
 
 def getNumpySHValue(degree, idx, phi, theta):
     return getSHValueWithMethod(degree, idx, phi, theta, numpy)
@@ -156,12 +162,24 @@ def getParamIdx(degree, idx):
 def getSHModelValue(degree_max, phi, theta, params, method_name):
     assert len(params) == (degree_max+1)**2
 
-    value = 0
+    if method_name != 'math' or not isinstance(phi, list):
+        value = 0
+        for degree in range(degree_max+1):
+            for idx in range(-degree, degree+1, 1):
+                param_idx = getParamIdx(degree, idx)
+                param = params[param_idx]
+                if param == 0:
+                    continue
+                value += param * getSHValue(degree, idx, phi, theta, method_name)
+        return value
+
+    value_list = [0 for _ in range(len(phi))]
     for degree in range(degree_max+1):
         for idx in range(-degree, degree+1, 1):
             param_idx = getParamIdx(degree, idx)
             param = params[param_idx]
             if param == 0:
                 continue
-            value += param * getSHValue(degree, idx, phi, theta, method_name)
-    return value
+            for i in range(len(value_list)):
+                value_list[i] += param * getSHValue(degree, idx, phi[i], theta[i], method_name)
+    return value_list

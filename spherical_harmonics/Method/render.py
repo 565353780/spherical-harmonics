@@ -57,7 +57,7 @@ def renderBatchSHFunction(sh_function, method_name):
     return True
 
 def renderSHFunction(sh_function, method_name, use_batch=True):
-    if use_batch:
+    if use_batch and method_name != 'math':
         return renderBatchSHFunction(sh_function, method_name)
 
     phi = np.linspace(0, 2 * np.pi, 181)
