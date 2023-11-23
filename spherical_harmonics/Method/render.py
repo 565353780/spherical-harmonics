@@ -6,6 +6,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 from spherical_harmonics.Method.values import getSHModelValue, getSHValue
 from spherical_harmonics.Method.data import toData
+from spherical_harmonics.Method.direction import getDirections
 
 def renderSurface(directions: np.ndarray, values: np.ndarray):
     r = np.abs(values) * directions.transpose(2, 0, 1)
@@ -40,14 +41,7 @@ def renderBatchSHFunction(sh_function, method_name):
         toData(theta_2d, method_name), method_name=method_name),
         'numpy', np.float64)
 
-    xyz_2d = np.zeros([phi.shape[0], theta.shape[0], 3])
-    for i in range(phi.shape[0]):
-        for j in range(theta.shape[0]):
-            xyz_2d[i][j] = [
-                np.sin(theta[j]) * np.sin(phi[i]),
-                np.sin(theta[j]) * np.cos(phi[i]),
-                np.cos(theta[j]),
-            ]
+    xyz_2d = getDirections(phi, theta)
 
     if not renderSurface(xyz_2d, Ylm):
         print('[ERROR][render::renderBatchSHFunction]')
