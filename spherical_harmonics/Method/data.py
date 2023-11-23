@@ -126,3 +126,8 @@ def toData(params, method_name, dtype=None):
             if dtype is None:
                 return toJittor(params)
             return toJittor(params, dtype)
+        case _:
+            print('[ERROR][data::toData]')
+            print('\t method not defined for input data type!')
+            print('\t params.type:', type(params), 'to', method_name)
+            return None
