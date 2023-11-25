@@ -5,6 +5,7 @@ import math
 from scipy.special import sph_harm
 
 from spherical_harmonics.Config.weights import W0, W1, W2, W3
+from spherical_harmonics.Method.data import toData
 
 def isDegreeAndIdxValid(degree, idx):
     if degree < 0 or degree > 3:
@@ -29,11 +30,15 @@ def getWeight(degree, idx):
         case 3:
             return W3[real_idx]
 
-def getValue(degree, idx, phi, theta, method):
+def getValue(degree, idx, phi, theta, method, method_name):
     assert isDegreeAndIdxValid(degree, idx)
+
     match degree:
         case 0:
-            return 1
+            try:
+                return toData(numpy.ones_like(phi.detach().cpu(), dtype=float), method_name)
+            except:
+                return toData(numpy.ones_like(phi, dtype=float), method_name)
         case 1:
             match idx:
                 case 0:
@@ -105,30 +110,35 @@ def getValue(degree, idx, phi, theta, method):
                     s3p = method.sin(3.0 * phi)
                     return st * st * st * s3p
 
-def getSHValueWithMethod(degree, idx, phi, theta, method):
+def getSHValueWithMethod(degree, idx, phi, theta, method, method_name):
     weight = getWeight(degree, idx)
-    value = getValue(degree, idx, phi, theta, method)
+    value = getValue(degree, idx, phi, theta, method, method_name)
     assert weight is not None
     assert value is not None
     return weight * value
 
 def getMathSHValue(degree, idx, phi, theta):
+    if degree == 0:
+        if isinstance(phi, list):
+            return [1.0 for _ in range(len(phi))]
+        return 1.0
+
     if not isinstance(phi, list):
-        return getSHValueWithMethod(degree, idx, phi, theta, math)
+        return getSHValueWithMethod(degree, idx, phi, theta, math, 'math')
 
     value_list = []
     for p, t in zip(phi, theta):
-        value_list.append(getSHValueWithMethod(degree, idx, p, t, math))
+        value_list.append(getSHValueWithMethod(degree, idx, p, t, math, 'math'))
     return value_list
 
 def getNumpySHValue(degree, idx, phi, theta):
-    return getSHValueWithMethod(degree, idx, phi, theta, numpy)
+    return getSHValueWithMethod(degree, idx, phi, theta, numpy, 'numpy')
 
 def getTorchSHValue(degree, idx, phi, theta):
-    return getSHValueWithMethod(degree, idx, phi, theta, torch)
+    return getSHValueWithMethod(degree, idx, phi, theta, torch, 'torch').to(phi.device)
 
 def getJittorSHValue(degree, idx, phi, theta):
-    return getSHValueWithMethod(degree, idx, phi, theta, jittor)
+    return getSHValueWithMethod(degree, idx, phi, theta, jittor, 'jittor').to(phi.device)
 
 def getScipySHValue(degree, idx, phi, theta):
     complex_value = sph_harm(abs(idx), degree, phi, theta)
@@ -170,6 +180,7 @@ def getSHModelValue(degree_max, phi, theta, params, method_name):
                 param = params[param_idx]
                 if param == 0:
                     continue
+
                 value += param * getSHValue(degree, idx, phi, theta, method_name)
         return value
 
