@@ -4,11 +4,11 @@ import torch
 import math
 from scipy.special import sph_harm
 
-from spherical_harmonics.Config.weights import W0, W1, W2, W3
+from spherical_harmonics.Config.weights import W0, W1, W2, W3, W4
 from spherical_harmonics.Method.data import toData
 
 def isDegreeAndIdxValid(degree, idx):
-    if degree < 0 or degree > 3:
+    if degree < 0 or degree > 4:
         return False
 
     if idx < -degree or idx > degree:
@@ -16,10 +16,9 @@ def isDegreeAndIdxValid(degree, idx):
 
     return True
 
-
 def getWeight(degree, idx):
     assert isDegreeAndIdxValid(degree, idx)
-    real_idx = idx + degree
+    real_idx = abs(idx)
     match degree:
         case 0:
             return W0[real_idx]
@@ -29,86 +28,86 @@ def getWeight(degree, idx):
             return W2[real_idx]
         case 3:
             return W3[real_idx]
+        case 4:
+            return W4[real_idx]
+
+def getDeg0Value(phi, method_name):
+    try:
+        return toData(numpy.ones_like(phi.detach().cpu(), dtype=float), method_name)
+    except:
+        return toData(numpy.ones_like(phi, dtype=float), method_name)
+
+def getBaseValue(idx, phi, theta, method):
+    if idx == 0:
+        return 1.0
+
+    st = method.sin(theta) ** abs(idx)
+
+    if idx > 0:
+        return method.cos(1.0 * idx * phi) * st
+
+    return method.sin(-1.0 * idx * phi) * st
+
+def getDeg1ThetaValue(idx, theta, method):
+    match abs(idx):
+        case 0:
+            return method.cos(theta)
+        case 1:
+            return 1.0
+
+def getDeg2ThetaValue(idx, theta, method):
+    match abs(idx):
+        case 0:
+            ct = method.cos(theta)
+            return 3.0 * ct * ct - 1.0
+        case 1:
+            return method.cos(theta)
+        case 2:
+            return 1.0
+
+def getDeg3ThetaValue(idx, theta, method):
+    match abs(idx):
+        case 0:
+            ct = method.cos(theta)
+            return (5.0 * ct * ct - 3.0) * ct
+        case 1:
+            ct = method.cos(theta)
+            return (5.0 * ct * ct - 1.0)
+        case 2:
+            return method.cos(theta)
+        case 3:
+            return 1.0
+
+def getDeg4ThetaValue(idx, theta, method):
+    match abs(idx):
+        case 0:
+            ct = method.cos(theta)
+            return (35.0 * ct * ct - 30.0) * ct * ct + 3.0
+        case 1:
+            ct = method.cos(theta)
+            return (7.0 * ct * ct - 3.0) * ct
+        case 2:
+            ct = method.cos(theta)
+            return (7.0 * ct * ct - 1.0)
+        case 3:
+            return method.cos(theta)
+        case 4:
+            return 1.0
 
 def getValue(degree, idx, phi, theta, method, method_name):
     assert isDegreeAndIdxValid(degree, idx)
 
     match degree:
         case 0:
-            try:
-                return toData(numpy.ones_like(phi.detach().cpu(), dtype=float), method_name)
-            except:
-                return toData(numpy.ones_like(phi, dtype=float), method_name)
+            return getDeg0Value(phi, method_name)
         case 1:
-            match idx:
-                case 0:
-                    ct = method.cos(theta)
-                    return ct
-                case 1:
-                    st = method.sin(theta)
-                    cp = method.cos(phi)
-                    return st * cp
-                case -1:
-                    st = method.sin(theta)
-                    sp = method.sin(phi)
-                    return st * sp
+            return getBaseValue(idx, phi, theta, method) * getDeg1ThetaValue(idx, theta, method)
         case 2:
-            match idx:
-                case 0:
-                    ct = method.cos(theta)
-                    return 3.0 * ct * ct - 1.0
-                case 1:
-                    ct = method.cos(theta)
-                    st = method.sin(theta)
-                    cp = method.cos(phi)
-                    return st * ct * cp
-                case -1:
-                    ct = method.cos(theta)
-                    st = method.sin(theta)
-                    sp = method.sin(phi)
-                    return st * ct * sp
-                case 2:
-                    st = method.sin(theta)
-                    c2p = method.cos(2.0 * phi)
-                    return st * st * c2p
-                case -2:
-                    st = method.sin(theta)
-                    s2p = method.sin(2.0 * phi)
-                    return st * st * s2p
+            return getBaseValue(idx, phi, theta, method) * getDeg2ThetaValue(idx, theta, method)
         case 3:
-            match idx:
-                case 0:
-                    ct = method.cos(theta)
-                    return (5.0 * ct * ct - 3.0) * ct
-                case 1:
-                    ct = method.cos(theta)
-                    st = method.sin(theta)
-                    cp = method.cos(phi)
-                    return (5.0 * ct * ct - 1.0) * st * cp
-                case -1:
-                    ct = method.cos(theta)
-                    st = method.sin(theta)
-                    sp = method.sin(phi)
-                    return (5.0 * ct * ct - 1.0) * st * sp
-                case 2:
-                    ct = method.cos(theta)
-                    st = method.sin(theta)
-                    c2p = method.cos(2.0 * phi)
-                    sp = method.sin(phi)
-                    return ct * st * st * c2p
-                case -2:
-                    ct = method.cos(theta)
-                    st = method.sin(theta)
-                    s2p = method.sin(2.0 * phi)
-                    return ct * st * st * s2p
-                case 3:
-                    st = method.sin(theta)
-                    c3p = method.cos(3.0 * phi)
-                    return st * st * st * c3p
-                case -3:
-                    st = method.sin(theta)
-                    s3p = method.sin(3.0 * phi)
-                    return st * st * st * s3p
+            return getBaseValue(idx, phi, theta, method) * getDeg3ThetaValue(idx, theta, method)
+        case 4:
+            return getBaseValue(idx, phi, theta, method) * getDeg4ThetaValue(idx, theta, method)
 
 def getSHValueWithMethod(degree, idx, phi, theta, method, method_name):
     weight = getWeight(degree, idx)
