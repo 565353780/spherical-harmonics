@@ -130,14 +130,14 @@ def getMathSHValue(degree, idx, phi, theta):
         value_list.append(getSHValueWithMethod(degree, idx, p, t, math, 'math'))
     return value_list
 
-def getNumpySHValue(degree, idx, phi, theta):
-    return getSHValueWithMethod(degree, idx, phi, theta, numpy, 'numpy')
+def getNumpySHValue(degree, idx, phi, theta, dtype=numpy.float64):
+    return toData(getSHValueWithMethod(degree, idx, phi, theta, numpy, 'numpy'), 'numpy', dtype)
 
-def getTorchSHValue(degree, idx, phi, theta):
-    return getSHValueWithMethod(degree, idx, phi, theta, torch, 'torch').to(phi.device)
+def getTorchSHValue(degree, idx, phi, theta, dtype=torch.float64):
+    return toData(getSHValueWithMethod(degree, idx, phi, theta, torch, 'torch'), 'torch', dtype).to(phi.device)
 
-def getJittorSHValue(degree, idx, phi, theta):
-    return getSHValueWithMethod(degree, idx, phi, theta, jittor, 'jittor').to(phi.device)
+def getJittorSHValue(degree, idx, phi, theta, dtype=jittor.float64):
+    return toData(getSHValueWithMethod(degree, idx, phi, theta, jittor, 'jittor').to(phi.device), 'jittor', dtype).to(phi.device)
 
 def getScipySHValue(degree, idx, phi, theta):
     complex_value = sph_harm(abs(idx), degree, phi, theta)
@@ -148,18 +148,24 @@ def getScipySHValue(degree, idx, phi, theta):
         return numpy.sqrt(2) * (-1) ** idx * complex_value.real
     return complex_value.real
 
-def getSHValue(degree, idx, phi, theta, method_name='math'):
+def getSHValue(degree, idx, phi, theta, method_name='math', dtype=None):
     assert method_name in ['math', 'numpy', 'torch', 'jittor', 'scipy']
 
     match method_name:
         case 'math':
             return getMathSHValue(degree, idx, phi, theta)
         case 'numpy':
-            return getNumpySHValue(degree, idx, phi, theta)
+            if dtype is None:
+                return getNumpySHValue(degree, idx, phi, theta)
+            return getNumpySHValue(degree, idx, phi, theta, dtype)
         case 'torch':
-            return getTorchSHValue(degree, idx, phi, theta)
+            if dtype is None:
+                return getTorchSHValue(degree, idx, phi, theta)
+            return getTorchSHValue(degree, idx, phi, theta, dtype)
         case 'jittor':
-            return getJittorSHValue(degree, idx, phi, theta)
+            if dtype is None:
+                return getJittorSHValue(degree, idx, phi, theta)
+            return getJittorSHValue(degree, idx, phi, theta, dtype)
         case 'scipy':
             return getScipySHValue(degree, idx, phi, theta)
 
@@ -168,7 +174,7 @@ def getParamIdx(degree, idx):
     param_idx = degree**2 + real_idx
     return param_idx
 
-def getSHModelValue(degree_max, phi, theta, params, method_name):
+def getSHModelValue(degree_max, phi, theta, params, method_name, dtype=None):
     assert len(params) == (degree_max+1)**2
 
     if method_name != 'math' or not isinstance(phi, list):
@@ -180,7 +186,7 @@ def getSHModelValue(degree_max, phi, theta, params, method_name):
                 if param == 0:
                     continue
 
-                value += param * getSHValue(degree, idx, phi, theta, method_name)
+                value += param * getSHValue(degree, idx, phi, theta, method_name, dtype)
         return value
 
     value_list = [0 for _ in range(len(phi))]

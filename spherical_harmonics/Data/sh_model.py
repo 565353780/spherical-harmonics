@@ -15,7 +15,7 @@ class SHModel(object):
         return
 
     def getValue(self, phi, theta):
-        return getSHModelValue(self.degree_max, phi, theta, self.params, self.method_name)
+        return getSHModelValue(self.degree_max, phi, theta, self.params, self.method_name, self.dtype)
 
     def render(self):
         params = self.params

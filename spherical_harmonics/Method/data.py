@@ -14,8 +14,8 @@ def list2jittor(data: list, dtype=jittor.float64):
 def numpy2list(data: numpy.ndarray):
     return data.tolist()
 
-def numpy2torch(data: numpy.ndarray):
-    return torch.from_numpy(data)
+def numpy2torch(data: numpy.ndarray, dtype=torch.float64):
+    return torch.from_numpy(data).type(dtype)
 
 def numpy2jittor(data: numpy.ndarray):
     return jittor.Var(data)
@@ -78,13 +78,13 @@ def toNumpy(params, dtype=numpy.float64):
 
 def toTorch(params, dtype=torch.float64):
     if isinstance(params, torch.Tensor):
-        return params
+        return params.type(dtype)
 
     if isinstance(params, list):
         return list2torch(params, dtype)
 
     if isinstance(params, numpy.ndarray):
-        return numpy2torch(params)
+        return numpy2torch(params, dtype)
 
     if isinstance(params, jittor.Var):
         return jittor2torch(params)
