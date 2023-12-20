@@ -1,15 +1,18 @@
+import numpy as np
 from typing import Union
 
 from spherical_harmonics.Method.data import toData
 
 def getParams(degree_max: int, params: Union[list, None]=None, method_name: str='numpy', dtype=None):
+    new_params = np.array([0.1 for _ in range((degree_max+1)**2)], dtype=np.float64)
+
     if params is None:
-        params = [0.1 for _ in range((degree_max+1)**2)]
+        toData(new_params, method_name, dtype)
 
-    if len(params) != (degree_max+1)**2:
-        print('[ERROR][params::getParams]')
-        print('\t params size not matched with degree_max!')
-        print('\t params size =', len(params), ', degree_max =', degree_max)
-        return None
+    params = toData(params, 'numpy', np.float64)
 
-    return toData(params, method_name, dtype)
+    common_num = min(new_params.shape[0], params.shape[0])
+
+    new_params[:common_num] = params
+
+    return toData(new_params, method_name, dtype)
