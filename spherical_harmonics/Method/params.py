@@ -7,7 +7,7 @@ def getParams(degree_max: int, params: Union[list, None]=None, method_name: str=
     new_params = np.array([0.1 for _ in range((degree_max+1)**2)], dtype=np.float64)
 
     if params is None:
-        toData(new_params, method_name, dtype)
+        return toData(new_params, method_name, dtype)
 
     params = toData(params, 'numpy', np.float64)
 
