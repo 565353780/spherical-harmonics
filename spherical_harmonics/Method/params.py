@@ -4,7 +4,7 @@ from spherical_harmonics.Method.data import toData
 
 def getParams(degree_max: int, params: Union[list, None]=None, method_name: str='numpy', dtype=None):
     if params is None:
-        params = [0 for _ in range((degree_max+1)**2)]
+        params = [0.1 for _ in range((degree_max+1)**2)]
 
     if len(params) != (degree_max+1)**2:
         print('[ERROR][params::getParams]')
