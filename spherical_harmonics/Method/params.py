@@ -4,7 +4,7 @@ from typing import Union
 from spherical_harmonics.Method.data import toData
 
 def getParams(degree_max: int, params: Union[list, None]=None, method_name: str='numpy', dtype=None):
-    new_params = np.array([0.1 for _ in range((degree_max+1)**2)], dtype=np.float64)
+    new_params = np.array([0.0 for _ in range((degree_max+1)**2)], dtype=np.float64)
 
     if params is None:
         return toData(new_params, method_name, dtype)
