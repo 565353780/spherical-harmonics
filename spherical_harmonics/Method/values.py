@@ -174,28 +174,38 @@ def getParamIdx(degree, idx):
     param_idx = degree**2 + real_idx
     return param_idx
 
+def getSHValues(degree_max, phi, theta, method_name, dtype=None):
+    values = []
+
+    if method_name != 'math' or not isinstance(phi, list):
+        for degree in range(degree_max+1):
+            for idx in range(-degree, degree+1, 1):
+                values.append(getSHValue(degree, idx, phi, theta, method_name, dtype))
+        return values
+
+    values_list = [[] for _ in range(len(phi))]
+    for degree in range(degree_max+1):
+        for idx in range(-degree, degree+1, 1):
+            for i in range(len(value_list)):
+                values_list[i].append(getSHValue(degree, idx, phi[i], theta[i], method_name))
+    return values_list
+
 def getSHModelValue(degree_max, phi, theta, params, method_name, dtype=None):
     assert len(params) == (degree_max+1)**2
 
+    values = getSHValues(degree_max, phi, theta, method_name, dtype)
+
     if method_name != 'math' or not isinstance(phi, list):
         value = 0
-        for degree in range(degree_max+1):
-            for idx in range(-degree, degree+1, 1):
-                param_idx = getParamIdx(degree, idx)
-                param = params[param_idx]
-                if param == 0:
-                    continue
+        for i in range(len(params)):
+            value += params[i] * values[i]
 
-                value += param * getSHValue(degree, idx, phi, theta, method_name, dtype)
         return value
 
     value_list = [0 for _ in range(len(phi))]
-    for degree in range(degree_max+1):
-        for idx in range(-degree, degree+1, 1):
-            param_idx = getParamIdx(degree, idx)
-            param = params[param_idx]
-            if param == 0:
-                continue
-            for i in range(len(value_list)):
-                value_list[i] += param * getSHValue(degree, idx, phi[i], theta[i], method_name)
+
+    for i in range(len(value_list)):
+        for j in range(len(params)):
+            value_list[i] += params[j] * values[i][j]
+
     return value_list
