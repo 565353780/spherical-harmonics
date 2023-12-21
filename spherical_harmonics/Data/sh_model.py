@@ -49,10 +49,17 @@ class SHModel(object):
     def getValue(self, phi, theta):
         return getSHModelValue(self.degree_max, phi, theta, self.params, self.method_name, self.dtype)
 
+    def setParams(self, params: Union[list, np.ndarray]) -> bool:
+        self.params = params
+
+        self.updateParams()
+        return True
+
     def solveParams(self, phis: Union[list, np.ndarray], thetas: Union[list, np.ndarray], dists: Union[list, np.ndarray]) -> bool:
         values = np.array(getSHValues(self.degree_max, phis, thetas, 'numpy', np.float64)).transpose(1, 0)
         params = np.linalg.lstsq(values, dists, rcond=None)[0]
-        self.params = toData(params, self.method_name, self.dtype)
+
+        self.updateParams()
         return True
 
     def render(self):
