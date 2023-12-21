@@ -43,7 +43,7 @@ class SHModel(object):
 
     def solveParams(self, phis: Union[list, np.ndarray], thetas: Union[list, np.ndarray], dists: Union[list, np.ndarray]) -> bool:
         values = np.array(getSHValues(self.degree_max, phis, thetas, 'numpy', np.float64)).transpose(1, 0)
-        params = np.linalg.lstsq(values, dists, rcond=-1)[0]
+        params = np.linalg.lstsq(values, dists, rcond=None)[0]
         self.params = toData(params, self.method_name, self.dtype)
         return True
 
