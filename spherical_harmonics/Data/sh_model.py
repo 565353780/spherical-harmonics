@@ -24,17 +24,25 @@ class SHModel(object):
         self.params = getParams(self.degree_max, self.params, self.method_name, self.dtype)
         return True
 
-    def upperDegree(self):
-        self.degree_max += 1
-        self.degree_max = min(self.degree_max, DEGREE_MAX)
+    def isDegreeMin(self):
+        return self.degree_max == 0
 
+    def isDegreeMax(self):
+        return self.degree_max == DEGREE_MAX
+
+    def upperDegree(self):
+        if self.isDegreeMax():
+            return False
+
+        self.degree_max += 1
         self.updateParams()
         return True
 
     def lowerDegree(self):
-        self.degree_max -= 1
-        self.degree_max = max(self.degree_max, 0)
+        if self.isDegreeMin():
+            return False
 
+        self.degree_max -= 1
         self.updateParams()
         return True
 
