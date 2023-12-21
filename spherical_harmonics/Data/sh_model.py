@@ -1,8 +1,10 @@
+import numpy as np
 from typing import Union
 
 from spherical_harmonics.Config.constant import DEGREE_MAX
+from spherical_harmonics.Method.data import toData
 from spherical_harmonics.Method.render import renderSHModelSurface
-from spherical_harmonics.Method.values import getSHModelValue
+from spherical_harmonics.Method.values import getSHValues, getSHModelValue
 from spherical_harmonics.Method.params import getParams
 
 class SHModel(object):
@@ -38,6 +40,12 @@ class SHModel(object):
 
     def getValue(self, phi, theta):
         return getSHModelValue(self.degree_max, phi, theta, self.params, self.method_name, self.dtype)
+
+    def solveParams(self, phis: Union[list, np.ndarray], thetas: Union[list, np.ndarray], dists: Union[list, np.ndarray]) -> bool:
+        values = np.array(getSHValues(self.degree_max, phis, thetas, 'numpy', np.float64)).transpose(1, 0)
+        params = np.linalg.lstsq(values, dists, rcond=-1)[0]
+        self.params = toData(params, self.method_name, self.dtype)
+        return True
 
     def render(self):
         params = self.params
