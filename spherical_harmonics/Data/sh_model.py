@@ -15,10 +15,16 @@ class SHModel(object):
 
         self.params = None
 
+        self.updateDegree()
         self.updateParams()
 
         assert self.params is not None
         return
+
+    def updateDegree(self) -> bool:
+        self.degree_max = max(self.degree_max, 0)
+        self.degree_max = min(self.degree_max, DEGREE_MAX)
+        return True
 
     def updateParams(self) -> bool:
         self.params = getParams(self.degree_max, self.params, self.method_name, self.dtype)
