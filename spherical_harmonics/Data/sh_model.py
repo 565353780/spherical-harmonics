@@ -1,5 +1,6 @@
 import numpy as np
 from typing import Union
+from copy import deepcopy
 
 from spherical_harmonics.Config.constant import DEGREE_MAX
 from spherical_harmonics.Method.data import toData
@@ -35,6 +36,12 @@ class SHModel(object):
 
     def isDegreeMax(self):
         return self.degree_max == DEGREE_MAX
+
+    def getDegree(self) -> int:
+        return self.degree_max
+
+    def getParams(self) -> np.ndarray:
+        return deepcopy(self.params)
 
     def upperDegree(self):
         if self.isDegreeMax():
