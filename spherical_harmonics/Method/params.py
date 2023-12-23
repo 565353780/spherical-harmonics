@@ -13,6 +13,6 @@ def getParams(degree_max: int, params: Union[list, None]=None, method_name: str=
 
     common_num = min(new_params.shape[0], params.shape[0])
 
-    new_params[:common_num] = params
+    new_params[:common_num] = params[:common_num]
 
     return toData(new_params, method_name, dtype)

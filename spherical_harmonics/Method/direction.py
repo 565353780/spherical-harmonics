@@ -39,7 +39,7 @@ def getParam(direction):
 def getParams(directions):
     norm = np.linalg.norm(directions, axis=1)
 
-    valid_mask = norm > 0
+    valid_mask = (norm > 0) & (directions[:, 2] != 1.0)
 
     valid_norm = norm[valid_mask]
 
