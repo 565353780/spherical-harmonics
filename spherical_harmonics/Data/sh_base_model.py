@@ -3,9 +3,8 @@ from typing import Union
 from copy import deepcopy
 
 from spherical_harmonics.Config.constant import DEGREE_MAX
-from spherical_harmonics.Method.params import getParams
 
-class BaseModel(object):
+class SHBaseModel(object):
     def __init__(self, degree_max: int=0, method_name: str='numpy', dtype=None) -> None:
         self.degree_max = degree_max
         self.method_name = method_name
@@ -22,10 +21,6 @@ class BaseModel(object):
     def updateDegree(self) -> bool:
         self.degree_max = max(self.degree_max, 0)
         self.degree_max = min(self.degree_max, DEGREE_MAX)
-        return True
-
-    def updateParams(self) -> bool:
-        self.params = getParams(self.degree_max, self.params, self.method_name, self.dtype)
         return True
 
     def isDegreeMin(self):

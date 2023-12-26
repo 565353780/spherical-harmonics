@@ -6,8 +6,14 @@ from scipy.special import sph_harm
 
 from spherical_harmonics.Config.weights import W0, W1, W2, W3, W4
 from spherical_harmonics.Method.data import toData
+from spherical_harmonics.Method.values_base import getDeg0Value
 
-def isDegreeAndIdxValid(degree, idx):
+def get3DParamIdx(degree, idx):
+    real_idx = idx + degree
+    param_idx = degree**2 + real_idx
+    return param_idx
+
+def is3DDegreeAndIdxValid(degree, idx):
     if degree < 0 or degree > 4:
         return False
 
@@ -16,8 +22,8 @@ def isDegreeAndIdxValid(degree, idx):
 
     return True
 
-def getWeight(degree, idx):
-    assert isDegreeAndIdxValid(degree, idx)
+def get3DWeight(degree, idx):
+    assert is3DDegreeAndIdxValid(degree, idx)
     real_idx = abs(idx)
     match degree:
         case 0:
@@ -31,13 +37,7 @@ def getWeight(degree, idx):
         case 4:
             return W4[real_idx]
 
-def getDeg0Value(phi, method_name):
-    try:
-        return toData(numpy.ones_like(phi.detach().cpu(), dtype=float), method_name)
-    except:
-        return toData(numpy.ones_like(phi, dtype=float), method_name)
-
-def getBaseValue(idx, phi, theta, method):
+def get3DBaseValue(idx, phi, theta, method):
     if idx == 0:
         return 1.0
 
@@ -94,52 +94,52 @@ def getDeg4ThetaValue(idx, theta, method):
         case 4:
             return 1.0
 
-def getValue(degree, idx, phi, theta, method, method_name):
-    assert isDegreeAndIdxValid(degree, idx)
+def get3DValue(degree, idx, phi, theta, method, method_name):
+    assert is3DDegreeAndIdxValid(degree, idx)
 
     match degree:
         case 0:
             return getDeg0Value(phi, method_name)
         case 1:
-            return getBaseValue(idx, phi, theta, method) * getDeg1ThetaValue(idx, theta, method)
+            return get3DBaseValue(idx, phi, theta, method) * getDeg1ThetaValue(idx, theta, method)
         case 2:
-            return getBaseValue(idx, phi, theta, method) * getDeg2ThetaValue(idx, theta, method)
+            return get3DBaseValue(idx, phi, theta, method) * getDeg2ThetaValue(idx, theta, method)
         case 3:
-            return getBaseValue(idx, phi, theta, method) * getDeg3ThetaValue(idx, theta, method)
+            return get3DBaseValue(idx, phi, theta, method) * getDeg3ThetaValue(idx, theta, method)
         case 4:
-            return getBaseValue(idx, phi, theta, method) * getDeg4ThetaValue(idx, theta, method)
+            return get3DBaseValue(idx, phi, theta, method) * getDeg4ThetaValue(idx, theta, method)
 
-def getSHValueWithMethod(degree, idx, phi, theta, method, method_name):
-    weight = getWeight(degree, idx)
-    value = getValue(degree, idx, phi, theta, method, method_name)
+def getSH3DValueWithMethod(degree, idx, phi, theta, method, method_name):
+    weight = get3DWeight(degree, idx)
+    value = get3DValue(degree, idx, phi, theta, method, method_name)
     assert weight is not None
     assert value is not None
     return weight * value
 
-def getMathSHValue(degree, idx, phi, theta):
+def getMathSH3DValue(degree, idx, phi, theta):
     if degree == 0:
         if isinstance(phi, list):
             return [1.0 for _ in range(len(phi))]
         return 1.0
 
     if not isinstance(phi, list):
-        return getSHValueWithMethod(degree, idx, phi, theta, math, 'math')
+        return getSH3DValueWithMethod(degree, idx, phi, theta, math, 'math')
 
     value_list = []
     for p, t in zip(phi, theta):
-        value_list.append(getSHValueWithMethod(degree, idx, p, t, math, 'math'))
+        value_list.append(getSH3DValueWithMethod(degree, idx, p, t, math, 'math'))
     return value_list
 
-def getNumpySHValue(degree, idx, phi, theta, dtype=numpy.float64):
-    return toData(getSHValueWithMethod(degree, idx, phi, theta, numpy, 'numpy'), 'numpy', dtype)
+def getNumpySH3DValue(degree, idx, phi, theta, dtype=numpy.float64):
+    return toData(getSH3DValueWithMethod(degree, idx, phi, theta, numpy, 'numpy'), 'numpy', dtype)
 
-def getTorchSHValue(degree, idx, phi, theta, dtype=torch.float64):
-    return toData(getSHValueWithMethod(degree, idx, phi, theta, torch, 'torch'), 'torch', dtype).to(phi.device)
+def getTorchSH3DValue(degree, idx, phi, theta, dtype=torch.float64):
+    return toData(getSH3DValueWithMethod(degree, idx, phi, theta, torch, 'torch'), 'torch', dtype).to(phi.device)
 
-def getJittorSHValue(degree, idx, phi, theta, dtype=jittor.float64):
-    return toData(getSHValueWithMethod(degree, idx, phi, theta, jittor, 'jittor').to(phi.device), 'jittor', dtype).to(phi.device)
+def getJittorSH3DValue(degree, idx, phi, theta, dtype=jittor.float64):
+    return toData(getSH3DValueWithMethod(degree, idx, phi, theta, jittor, 'jittor').to(phi.device), 'jittor', dtype).to(phi.device)
 
-def getScipySHValue(degree, idx, phi, theta):
+def getScipySH3DValue(degree, idx, phi, theta):
     complex_value = sph_harm(abs(idx), degree, phi, theta)
 
     if idx < 0:
@@ -148,52 +148,47 @@ def getScipySHValue(degree, idx, phi, theta):
         return numpy.sqrt(2) * (-1) ** idx * complex_value.real
     return complex_value.real
 
-def getSHValue(degree, idx, phi, theta, method_name='math', dtype=None):
+def getSH3DValue(degree, idx, phi, theta, method_name='math', dtype=None):
     assert method_name in ['math', 'numpy', 'torch', 'jittor', 'scipy']
 
     match method_name:
         case 'math':
-            return getMathSHValue(degree, idx, phi, theta)
+            return getMathSH3DValue(degree, idx, phi, theta)
         case 'numpy':
             if dtype is None:
-                return getNumpySHValue(degree, idx, phi, theta)
-            return getNumpySHValue(degree, idx, phi, theta, dtype)
+                return getNumpySH3DValue(degree, idx, phi, theta)
+            return getNumpySH3DValue(degree, idx, phi, theta, dtype)
         case 'torch':
             if dtype is None:
-                return getTorchSHValue(degree, idx, phi, theta)
-            return getTorchSHValue(degree, idx, phi, theta, dtype)
+                return getTorchSH3DValue(degree, idx, phi, theta)
+            return getTorchSH3DValue(degree, idx, phi, theta, dtype)
         case 'jittor':
             if dtype is None:
-                return getJittorSHValue(degree, idx, phi, theta)
-            return getJittorSHValue(degree, idx, phi, theta, dtype)
+                return getJittorSH3DValue(degree, idx, phi, theta)
+            return getJittorSH3DValue(degree, idx, phi, theta, dtype)
         case 'scipy':
-            return getScipySHValue(degree, idx, phi, theta)
+            return getScipySH3DValue(degree, idx, phi, theta)
 
-def getParamIdx(degree, idx):
-    real_idx = idx + degree
-    param_idx = degree**2 + real_idx
-    return param_idx
-
-def getSHValues(degree_max, phi, theta, method_name, dtype=None):
+def getSH3DValues(degree_max, phi, theta, method_name, dtype=None):
     values = []
 
     if method_name != 'math' or not isinstance(phi, list):
         for degree in range(degree_max+1):
             for idx in range(-degree, degree+1, 1):
-                values.append(getSHValue(degree, idx, phi, theta, method_name, dtype))
+                values.append(getSH3DValue(degree, idx, phi, theta, method_name, dtype))
         return values
 
     values_list = [[] for _ in range(len(phi))]
     for degree in range(degree_max+1):
         for idx in range(-degree, degree+1, 1):
-            for i in range(len(value_list)):
-                values_list[i].append(getSHValue(degree, idx, phi[i], theta[i], method_name))
+            for i in range(len(values_list)):
+                values_list[i].append(getSH3DValue(degree, idx, phi[i], theta[i], method_name))
     return values_list
 
-def getSHModelValue(degree_max, phi, theta, params, method_name, dtype=None):
+def getSH3DModelValue(degree_max, phi, theta, params, method_name, dtype=None):
     assert len(params) == (degree_max+1)**2
 
-    values = getSHValues(degree_max, phi, theta, method_name, dtype)
+    values = getSH3DValues(degree_max, phi, theta, method_name, dtype)
 
     if method_name != 'math' or not isinstance(phi, list):
         value = 0

@@ -4,11 +4,11 @@ from matplotlib import cm
 from functools import partial
 from mpl_toolkits.mplot3d import Axes3D
 
-from spherical_harmonics.Method.values import getSHModelValue, getSHValue
+from spherical_harmonics.Method.values_3d import getSH3DModelValue, getSH3DValue
 from spherical_harmonics.Method.data import toData
 from spherical_harmonics.Method.direction import getDirections
 
-def renderSurface(directions: np.ndarray, values: np.ndarray):
+def render3DSurface(directions: np.ndarray, values: np.ndarray):
     r = np.abs(values) * directions.transpose(2, 0, 1)
 
     colormap = cm.ScalarMappable(cmap=plt.get_cmap("RdYlBu_r"))
@@ -30,7 +30,7 @@ def renderSurface(directions: np.ndarray, values: np.ndarray):
     plt.show()
     return True
 
-def renderBatchSHFunction(sh_function, method_name):
+def renderBatchSH3DFunction(sh_function, method_name):
     phi = np.linspace(0, 2 * np.pi, 181)
     theta = np.linspace(0, np.pi, 91)
 
@@ -43,16 +43,16 @@ def renderBatchSHFunction(sh_function, method_name):
 
     xyz_2d = getDirections(phi, theta)
 
-    if not renderSurface(xyz_2d, Ylm):
+    if not render3DSurface(xyz_2d, Ylm):
         print('[ERROR][render::renderBatchSHFunction]')
-        print('\t renderSurface failed!')
+        print('\t render3DSurface failed!')
         return False
 
     return True
 
-def renderSHFunction(sh_function, method_name, use_batch=True):
+def renderSH3DFunction(sh_function, method_name, use_batch=True):
     if use_batch and method_name != 'math':
-        return renderBatchSHFunction(sh_function, method_name)
+        return renderBatchSH3DFunction(sh_function, method_name)
 
     phi = np.linspace(0, 2 * np.pi, 181)
     theta = np.linspace(0, np.pi, 91)
@@ -75,17 +75,17 @@ def renderSHFunction(sh_function, method_name, use_batch=True):
                 np.cos(theta[j]),
             ]
 
-    if not renderSurface(xyz_2d, Ylm):
+    if not render3DSurface(xyz_2d, Ylm):
         print('[ERROR][render::renderSHFunction]')
-        print('\t renderSurface failed!')
+        print('\t render3DSurface failed!')
         return False
 
     return True
 
-def renderSHSurface(degree, idx, method_name='math'):
-    sh_function = partial(getSHValue, degree, idx)
-    return renderSHFunction(sh_function, method_name)
+def renderSH3DSurface(degree, idx, method_name='math'):
+    sh_function = partial(getSH3DValue, degree, idx)
+    return renderSH3DFunction(sh_function, method_name)
 
-def renderSHModelSurface(degree_max, params, method_name='math'):
-    sh_function = partial(getSHModelValue, degree_max, params=params)
-    return renderSHFunction(sh_function, method_name)
+def renderSH3DModelSurface(degree_max, params, method_name='math'):
+    sh_function = partial(getSH3DModelValue, degree_max, params=params)
+    return renderSH3DFunction(sh_function, method_name)

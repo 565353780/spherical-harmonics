@@ -14,7 +14,7 @@ def getDirections(phi_array, theta_array):
 
     return directions
 
-def getParam(direction):
+def getPhiTheta(direction):
     norm = np.linalg.norm(direction)
 
     if norm == 0:
@@ -36,7 +36,7 @@ def getParam(direction):
 
     return phi, theta
 
-def getParams(directions):
+def getPhisThetas(directions):
     norm = np.linalg.norm(directions, axis=1)
 
     valid_mask = (norm > 0) & (directions[:, 2] != 1.0)
