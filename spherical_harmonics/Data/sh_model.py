@@ -3,13 +3,12 @@ from typing import Union
 from copy import deepcopy
 
 from spherical_harmonics.Config.constant import DEGREE_MAX
-from spherical_harmonics.Method.data import toData
 from spherical_harmonics.Method.render import renderSHModelSurface
 from spherical_harmonics.Method.values import getSHValues, getSHModelValue
 from spherical_harmonics.Method.params import getParams
 
 class SHModel(object):
-    def __init__(self, degree_max: int=0, params: Union[list, None]=None, method_name: str='numpy', dtype=None) -> None:
+    def __init__(self, degree_max: int=0, method_name: str='numpy', dtype=None) -> None:
         self.degree_max = degree_max
         self.method_name = method_name
         self.dtype = dtype
