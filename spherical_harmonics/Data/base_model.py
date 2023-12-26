@@ -3,11 +3,9 @@ from typing import Union
 from copy import deepcopy
 
 from spherical_harmonics.Config.constant import DEGREE_MAX
-from spherical_harmonics.Method.render import renderSHModelSurface
-from spherical_harmonics.Method.values import getSHValues, getSHModelValue
 from spherical_harmonics.Method.params import getParams
 
-class SHModel(object):
+class BaseModel(object):
     def __init__(self, degree_max: int=0, method_name: str='numpy', dtype=None) -> None:
         self.degree_max = degree_max
         self.method_name = method_name
@@ -58,31 +56,14 @@ class SHModel(object):
         self.updateParams()
         return True
 
-    def getValue(self, phi, theta):
-        return getSHModelValue(self.degree_max, phi, theta, self.params, self.method_name, self.dtype)
-
     def setParams(self, params: Union[list, np.ndarray]) -> bool:
         self.params = params
 
         self.updateParams()
         return True
 
-    def solveParams(self, phis: Union[list, np.ndarray], thetas: Union[list, np.ndarray], dists: Union[list, np.ndarray]) -> bool:
-        values = np.array(getSHValues(self.degree_max, phis, thetas, 'numpy', np.float64)).transpose(1, 0)
-
+    def solveParams(self, values: Union[list, np.ndarray], dists: Union[list, np.ndarray]) -> bool:
         self.params = np.linalg.lstsq(values, dists, rcond=None)[0]
 
         self.updateParams()
-        return True
-
-    def render(self):
-        params = self.params
-        if self.method_name in ['torch', 'jittor']:
-            params = self.params.detach().cpu()
-
-        if not renderSHModelSurface(self.degree_max, params, self.method_name):
-            print('[ERROR][SHModel::render]')
-            print('\t renderSHModelSurface failed!')
-            return False
-
         return True
