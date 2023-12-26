@@ -1,6 +1,7 @@
 import numpy as np
 from typing import Union
 
+from spherical_harmonics.Config.degrees import DEGREE_MAX_3D
 from spherical_harmonics.Method.render_3d import renderSH3DModelSurface
 from spherical_harmonics.Method.values_3d import getSH3DValues, getSH3DModelValue
 from spherical_harmonics.Method.params import get3DParams
@@ -10,6 +11,17 @@ class SH3DModel(SHBaseModel):
     def __init__(self, degree_max: int=0, method_name: str='numpy', dtype=None) -> None:
         SHBaseModel.__init__(self, degree_max, method_name, dtype)
         return
+
+    def updateDegree(self) -> bool:
+        SHBaseModel.updateDegree(self)
+        if DEGREE_MAX_3D > 0:
+            self.degree_max = min(self.degree_max, DEGREE_MAX_3D)
+        return True
+
+    def isDegreeMax(self):
+        if DEGREE_MAX_3D < 0:
+            return False
+        return self.degree_max == DEGREE_MAX_3D
 
     def updateParams(self) -> bool:
         self.params = get3DParams(self.degree_max, self.params, self.method_name, self.dtype)

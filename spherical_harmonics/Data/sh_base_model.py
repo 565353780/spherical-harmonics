@@ -2,8 +2,6 @@ import numpy as np
 from typing import Union
 from copy import deepcopy
 
-from spherical_harmonics.Config.constant import DEGREE_MAX
-
 class SHBaseModel(object):
     def __init__(self, degree_max: int=0, method_name: str='numpy', dtype=None) -> None:
         self.degree_max = degree_max
@@ -18,16 +16,22 @@ class SHBaseModel(object):
         assert self.params is not None
         return
 
+    def updateParams(self) -> bool:
+        print('[ERROR][SHBaseModel::updateParams]')
+        print('\t please finish this function first!')
+        return False
+
+    def isDegreeMax(self) -> bool:
+        print('[ERROR][SHBaseModel::isDegreeMax]')
+        print('\t please finish this function first!')
+        return False
+
     def updateDegree(self) -> bool:
         self.degree_max = max(self.degree_max, 0)
-        self.degree_max = min(self.degree_max, DEGREE_MAX)
         return True
 
     def isDegreeMin(self):
         return self.degree_max == 0
-
-    def isDegreeMax(self):
-        return self.degree_max == DEGREE_MAX
 
     def getDegree(self) -> int:
         return self.degree_max
