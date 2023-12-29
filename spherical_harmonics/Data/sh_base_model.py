@@ -16,6 +16,10 @@ class SHBaseModel(object):
         assert self.params is not None
         return
 
+    def resetDegree(self) -> bool:
+        self.degree_max = 0
+        return True
+
     def updateParams(self) -> bool:
         print('[ERROR][SHBaseModel::updateParams]')
         print('\t please finish this function first!')
