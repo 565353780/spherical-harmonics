@@ -17,7 +17,11 @@ class SHBaseModel(object):
         return
 
     def resetDegree(self) -> bool:
+        if self.degree_max == 0:
+            return True
+
         self.degree_max = 0
+        self.updateParams()
         return True
 
     def updateParams(self) -> bool:
