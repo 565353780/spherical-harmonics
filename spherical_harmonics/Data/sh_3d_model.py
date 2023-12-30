@@ -40,7 +40,7 @@ class SH3DModel(SHBaseModel):
                       thetas: Union[list, np.ndarray, torch.Tensor, jt.Var],
                       dists: Union[list, np.ndarray, torch.Tensor, jt.Var],
                       method_name: str='torch', dtype=None) -> Union[list, np.ndarray, torch.Tensor, jt.Var]:
-        values = np.array(getSH3DValues(self.degree_max, phis, thetas, method_name, dtype)).transpose(1, 0)
+        values = getSH3DModelValue(self.degree_max, phi, theta, toData(self.params, method_name, dtype), method_name, dtype)
         return SHBaseModel.getDiffValues(values, dists, method_name, dtype)
 
     def render(self):

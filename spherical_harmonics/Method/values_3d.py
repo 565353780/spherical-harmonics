@@ -135,7 +135,7 @@ def getNumpySH3DValue(degree, idx, phi, theta, dtype=numpy.float64):
     return toData(getSH3DValueWithMethod(degree, idx, phi, theta, numpy, 'numpy'), 'numpy', dtype)
 
 def getTorchSH3DValue(degree, idx, phi, theta, dtype=torch.float64):
-    return toData(getSH3DValueWithMethod(degree, idx, phi, theta, torch, 'torch'), 'torch', dtype).to(phi.device)
+    return toData(getSH3DValueWithMethod(degree, idx, phi, theta, torch, 'torch').to(phi.device), 'torch', dtype).to(phi.device)
 
 def getJittorSH3DValue(degree, idx, phi, theta, dtype=jittor.float64):
     return toData(getSH3DValueWithMethod(degree, idx, phi, theta, jittor, 'jittor').to(phi.device), 'jittor', dtype).to(phi.device)

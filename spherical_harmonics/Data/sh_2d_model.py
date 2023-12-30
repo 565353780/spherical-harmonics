@@ -39,7 +39,7 @@ class SH2DModel(SHBaseModel):
     def getDiffValues(self, phis: Union[list, np.ndarray, torch.Tensor, jt.Var],
                       dists: Union[list, np.ndarray, torch.Tensor, jt.Var],
                       method_name: str='torch', dtype=None) -> Union[list, np.ndarray, torch.Tensor, jt.Var]:
-        values = np.array(getSH2DValues(self.degree_max, phis, method_name, dtype)).transpose(1, 0)
+        values = getSH2DModelValue(self.degree_max, phi, toData(self.params, method_name, dtype), method_name, dtype)
         return SHBaseModel.getDiffValues(values, dists, method_name, dtype)
 
     def render(self):
