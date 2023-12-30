@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+import jittor as jt
 from typing import Union
 
 from spherical_harmonics.Config.degrees import DEGREE_MAX_3D
@@ -35,10 +36,10 @@ class SH3DModel(SHBaseModel):
         values = np.array(getSH3DValues(self.degree_max, phis, thetas, 'numpy', np.float64)).transpose(1, 0)
         return SHBaseModel.solveParams(self, values, dists)
 
-    def getDiffValues(self, phis: Union[list, np.ndarray, torch.Tensor],
-                      thetas: Union[list, np.ndarray, torch.Tensor],
-                      dists: Union[list, np.ndarray, torch.Tensor],
-                      method_name: str='torch', dtype=None) -> Union[list, np.ndarray, torch.Tensor]:
+    def getDiffValues(self, phis: Union[list, np.ndarray, torch.Tensor, jt.Var],
+                      thetas: Union[list, np.ndarray, torch.Tensor, jt.Var],
+                      dists: Union[list, np.ndarray, torch.Tensor, jt.Var],
+                      method_name: str='torch', dtype=None) -> Union[list, np.ndarray, torch.Tensor, jt.Var]:
         values = np.array(getSH3DValues(self.degree_max, phis, thetas, method_name, dtype)).transpose(1, 0)
         return SHBaseModel.getDiffValues(values, dists, method_name, dtype)
 
