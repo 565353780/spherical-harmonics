@@ -4,9 +4,10 @@ from matplotlib import cm
 from functools import partial
 from mpl_toolkits.mplot3d import Axes3D
 
+from data_convert.Method.data import toData
+
 from spherical_harmonics.Config.constant import PI_H
 from spherical_harmonics.Method.values_2d import getSH2DModelValue, getSH2DValue
-from spherical_harmonics.Method.data import toData
 from spherical_harmonics.Method.direction import getDirections
 
 def render2DCurve(directions: np.ndarray, values: np.ndarray):

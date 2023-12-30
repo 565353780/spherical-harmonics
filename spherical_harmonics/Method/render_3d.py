@@ -4,8 +4,9 @@ from matplotlib import cm
 from functools import partial
 from mpl_toolkits.mplot3d import Axes3D
 
+from data_convert.Method.data import toData
+
 from spherical_harmonics.Method.values_3d import getSH3DModelValue, getSH3DValue
-from spherical_harmonics.Method.data import toData
 from spherical_harmonics.Method.direction import getDirections
 
 def render3DSurface(directions: np.ndarray, values: np.ndarray):

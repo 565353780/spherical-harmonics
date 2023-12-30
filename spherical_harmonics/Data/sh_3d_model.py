@@ -1,3 +1,4 @@
+import torch
 import numpy as np
 from typing import Union
 
@@ -33,6 +34,13 @@ class SH3DModel(SHBaseModel):
     def solveParams(self, phis: Union[list, np.ndarray], thetas: Union[list, np.ndarray], dists: Union[list, np.ndarray]) -> bool:
         values = np.array(getSH3DValues(self.degree_max, phis, thetas, 'numpy', np.float64)).transpose(1, 0)
         return SHBaseModel.solveParams(self, values, dists)
+
+    def getDiffValues(self, phis: Union[list, np.ndarray, torch.Tensor],
+                      thetas: Union[list, np.ndarray, torch.Tensor],
+                      dists: Union[list, np.ndarray, torch.Tensor],
+                      method_name: str='torch', dtype=None) -> Union[list, np.ndarray, torch.Tensor]:
+        values = np.array(getSH3DValues(self.degree_max, phis, thetas, method_name, dtype)).transpose(1, 0)
+        return SHBaseModel.getDiffValues(values, dists, method_name, dtype)
 
     def render(self):
         params = self.params

@@ -1,7 +1,7 @@
 import numpy as np
 from typing import Union
 
-from spherical_harmonics.Method.data import toData
+from data_convert.Method.data import toData
 
 def get2DParams(degree_max: int, params: Union[list, None]=None, method_name: str='numpy', dtype=None):
     new_params = np.array([0.0 for _ in range(2*degree_max+1)], dtype=np.float64)

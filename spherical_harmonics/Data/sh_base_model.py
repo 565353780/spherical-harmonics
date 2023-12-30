@@ -1,6 +1,10 @@
+import torch
+import jittor as jt
 import numpy as np
 from typing import Union
 from copy import deepcopy
+
+from data_convert.Method.data import toData
 
 class SHBaseModel(object):
     def __init__(self, degree_max: int=0, method_name: str='numpy', dtype=None) -> None:
@@ -74,3 +78,12 @@ class SHBaseModel(object):
 
         self.updateParams()
         return True
+
+    def getDiffValues(self,
+                      values: Union[list, np.ndarray, torch.Tensor],
+                      dists: Union[list, np.ndarray, torch.Tensor],
+                      method_name: str='torch', dtype=None) -> Union[list, np.ndarray, torch.Tensor]:
+        if isinstance(values, torch.Tensor) or isinstance(values, jt.Var):
+            return values - toData(dists, method_name, dtype).to(values.device)
+
+        return values - toData(dists, method_name, dtype)

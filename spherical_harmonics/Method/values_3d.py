@@ -4,8 +4,9 @@ import torch
 import math
 from scipy.special import sph_harm
 
+from data_convert.Method.data import toData
+
 from spherical_harmonics.Config.weights import W0, W1, W2, W3, W4
-from spherical_harmonics.Method.data import toData
 from spherical_harmonics.Method.values_base import getDeg0Value
 
 def get3DParamIdx(degree, idx):

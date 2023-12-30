@@ -4,8 +4,9 @@ import torch
 import math
 from scipy.special import sph_harm
 
+from data_convert.Method.data import toData
+
 from spherical_harmonics.Config.constant import PI
-from spherical_harmonics.Method.data import toData
 from spherical_harmonics.Method.values_base import getDeg0Value
 
 def get2DValue(degree, idx, phi, method, method_name):

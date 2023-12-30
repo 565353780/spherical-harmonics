@@ -1,3 +1,6 @@
+import sys
+sys.path.append('../data-convert/')
+
 from spherical_harmonics.Data.sh_2d_model import SH2DModel
 
 def demo():

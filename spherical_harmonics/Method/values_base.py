@@ -1,6 +1,6 @@
 import numpy
 
-from spherical_harmonics.Method.data import toData
+from data_convert.Method.data import toData
 
 def getDeg0Value(phi, method_name):
     try:
