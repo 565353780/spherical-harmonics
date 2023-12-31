@@ -78,18 +78,3 @@ class SHBaseModel(object):
 
         self.updateParams()
         return True
-
-    def getDiffValues(self,
-                      values: Union[list, np.ndarray, torch.Tensor, jt.Var],
-                      dists: Union[list, np.ndarray, torch.Tensor, jt.Var],
-                      method_name: str='torch', dtype=None) -> Union[list, np.ndarray, torch.Tensor, jt.Var]:
-        if isinstance(values, torch.Tensor) or isinstance(values, jt.Var):
-            return values - toData(dists, method_name, dtype).to(values.device)
-
-        if isinstance(values, np.ndarray):
-            return values - toData(dists, method_name, dtype)
-
-        diff_values = []
-        for value, dist in zip(values, dists):
-            diff_values.append(value - dist)
-        return diff_values

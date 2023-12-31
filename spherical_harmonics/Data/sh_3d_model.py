@@ -3,6 +3,8 @@ import numpy as np
 import jittor as jt
 from typing import Union
 
+from data_convert.Method.data import toData
+
 from spherical_harmonics.Config.degrees import DEGREE_MAX_3D
 from spherical_harmonics.Method.render_3d import renderSH3DModelSurface
 from spherical_harmonics.Method.values_3d import getSH3DValues, getSH3DModelValue
@@ -29,8 +31,8 @@ class SH3DModel(SHBaseModel):
         self.params = get3DParams(self.degree_max, self.params, self.method_name, self.dtype)
         return True
 
-    def getValue(self, phi, theta):
-        return getSH3DModelValue(self.degree_max, phi, theta, self.params, self.method_name, self.dtype)
+    def getValue(self, phis, thetas):
+        return getSH3DModelValue(self.degree_max, phis, thetas, self.params, self.method_name, self.dtype)
 
     def solveParams(self, phis: Union[list, np.ndarray], thetas: Union[list, np.ndarray], dists: Union[list, np.ndarray]) -> bool:
         values = np.array(getSH3DValues(self.degree_max, phis, thetas, 'numpy', np.float64)).transpose(1, 0)
@@ -38,10 +40,8 @@ class SH3DModel(SHBaseModel):
 
     def getDiffValues(self, phis: Union[list, np.ndarray, torch.Tensor, jt.Var],
                       thetas: Union[list, np.ndarray, torch.Tensor, jt.Var],
-                      dists: Union[list, np.ndarray, torch.Tensor, jt.Var],
                       method_name: str='torch', dtype=None) -> Union[list, np.ndarray, torch.Tensor, jt.Var]:
-        values = getSH3DModelValue(self.degree_max, phi, theta, toData(self.params, method_name, dtype), method_name, dtype)
-        return SHBaseModel.getDiffValues(values, dists, method_name, dtype)
+        return getSH3DModelValue(self.degree_max, phis, thetas, toData(self.params, method_name, dtype), method_name, dtype)
 
     def render(self):
         params = self.params

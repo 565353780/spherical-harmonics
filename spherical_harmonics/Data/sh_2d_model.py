@@ -3,6 +3,8 @@ import numpy as np
 import jittor as jt
 from typing import Union
 
+from data_convert.Method.data import toData
+
 from spherical_harmonics.Config.degrees import DEGREE_MAX_2D
 from spherical_harmonics.Method.render_2d import renderSH2DModelCurve
 from spherical_harmonics.Method.values_2d import getSH2DValues, getSH2DModelValue
@@ -29,18 +31,16 @@ class SH2DModel(SHBaseModel):
         self.params = get2DParams(self.degree_max, self.params, self.method_name, self.dtype)
         return True
 
-    def getValue(self, phi):
-        return getSH2DModelValue(self.degree_max, phi, self.params, self.method_name, self.dtype)
+    def getValue(self, phis):
+        return getSH2DModelValue(self.degree_max, phis, self.params, self.method_name, self.dtype)
 
     def solveParams(self, phis: Union[list, np.ndarray], dists: Union[list, np.ndarray]) -> bool:
         values = np.array(getSH2DValues(self.degree_max, phis, 'numpy', np.float64)).transpose(1, 0)
         return SHBaseModel.solveParams(self, values, dists)
 
     def getDiffValues(self, phis: Union[list, np.ndarray, torch.Tensor, jt.Var],
-                      dists: Union[list, np.ndarray, torch.Tensor, jt.Var],
                       method_name: str='torch', dtype=None) -> Union[list, np.ndarray, torch.Tensor, jt.Var]:
-        values = getSH2DModelValue(self.degree_max, phi, toData(self.params, method_name, dtype), method_name, dtype)
-        return SHBaseModel.getDiffValues(values, dists, method_name, dtype)
+        return getSH2DModelValue(self.degree_max, phis, toData(self.params, method_name, dtype), method_name, dtype)
 
     def render(self):
         params = self.params
