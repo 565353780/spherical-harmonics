@@ -28,6 +28,12 @@ class SHBaseModel(object):
         self.updateParams()
         return True
 
+    def reset(self) -> bool:
+        self.resetDegree()
+
+        self.params = toData([0.0], 'numpy', np.float64)
+        return True
+
     def updateParams(self) -> bool:
         print('[ERROR][SHBaseModel::updateParams]')
         print('\t please finish this function first!')
