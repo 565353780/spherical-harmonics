@@ -34,6 +34,19 @@ class SHBaseModel(object):
         self.params = toData([0.0], 'numpy', np.float64)
         return True
 
+    def toDict(self) -> dict:
+        return {
+            'degree_max': self.degree_max,
+            'params': self.getParams().tolist(),
+        }
+
+    def loadDict(self, sh_dict: dict) -> bool:
+        self.degree_max = int(sh_dict['degree_max'])
+        self.params = sh_dict['params']
+        self.updateDegree()
+        self.updateParams()
+        return True
+
     def updateParams(self) -> bool:
         print('[ERROR][SHBaseModel::updateParams]')
         print('\t please finish this function first!')
