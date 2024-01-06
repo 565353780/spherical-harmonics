@@ -6,7 +6,8 @@ from scipy.special import sph_harm
 
 from data_convert.Method.data import toData
 
-from spherical_harmonics.Config.weights import W0, W1, W2, W3, W4
+from spherical_harmonics.Config.degrees import DEGREE_MAX_3D
+from spherical_harmonics.Config.weights import W0, W1, W2, W3, W4, W5, W6
 from spherical_harmonics.Method.values_base import getDeg0Value
 
 def get3DParamIdx(degree, idx):
@@ -15,7 +16,7 @@ def get3DParamIdx(degree, idx):
     return param_idx
 
 def is3DDegreeAndIdxValid(degree, idx):
-    if degree < 0 or degree > 4:
+    if degree < 0 or degree > DEGREE_MAX_3D:
         return False
 
     if idx < -degree or idx > degree:
@@ -37,6 +38,10 @@ def get3DWeight(degree, idx):
             return W3[real_idx]
         case 4:
             return W4[real_idx]
+        case 5:
+            return W5[real_idx]
+        case 6:
+            return W6[real_idx]
 
 def get3DBaseValue(idx, phi, theta, method):
     if idx == 0:
@@ -95,6 +100,47 @@ def getDeg4ThetaValue(idx, theta, method):
         case 4:
             return 1.0
 
+def getDeg5ThetaValue(idx, theta, method):
+    match abs(idx):
+        case 0:
+            ct = method.cos(theta)
+            return ((63.0 * ct * ct - 70.0) * ct * ct + 15.0) * ct
+        case 1:
+            ct = method.cos(theta)
+            return (21.0 * ct * ct - 14.0) * ct * ct + 1.0
+        case 2:
+            ct = method.cos(theta)
+            return (3.0 * ct * ct - 1.0) * ct
+        case 3:
+            ct = method.cos(theta)
+            return 9.0 * ct * ct - 1.0
+        case 4:
+            return method.cos(theta)
+        case 5:
+            return 1.0
+
+def getDeg6ThetaValue(idx, theta, method):
+    match abs(idx):
+        case 0:
+            ct = method.cos(theta)
+            return ((231.0 * ct * ct - 315.0) * ct * ct + 105.0) * ct * ct - 5.0
+        case 1:
+            ct = method.cos(theta)
+            return ((33.0 * ct * ct - 30.0) * ct * ct + 5.0) * ct
+        case 2:
+            ct = method.cos(theta)
+            return (33.0 * ct * ct - 18.0) * ct * ct + 1.0
+        case 3:
+            ct = method.cos(theta)
+            return (11.0 * ct * ct - 3.0) * ct
+        case 4:
+            ct = method.cos(theta)
+            return 11.0 * ct * ct - 1.0
+        case 5:
+            return method.cos(theta)
+        case 6:
+            return 1.0
+
 def get3DValue(degree, idx, phi, theta, method, method_name):
     assert is3DDegreeAndIdxValid(degree, idx)
 
@@ -109,6 +155,10 @@ def get3DValue(degree, idx, phi, theta, method, method_name):
             return get3DBaseValue(idx, phi, theta, method) * getDeg3ThetaValue(idx, theta, method)
         case 4:
             return get3DBaseValue(idx, phi, theta, method) * getDeg4ThetaValue(idx, theta, method)
+        case 5:
+            return get3DBaseValue(idx, phi, theta, method) * getDeg5ThetaValue(idx, theta, method)
+        case 6:
+            return get3DBaseValue(idx, phi, theta, method) * getDeg6ThetaValue(idx, theta, method)
 
 def getSH3DValueWithMethod(degree, idx, phi, theta, method, method_name):
     weight = get3DWeight(degree, idx)
