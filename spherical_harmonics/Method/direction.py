@@ -1,10 +1,12 @@
 import numpy as np
 
+
 def getDirection(phi, theta):
-    return np.array([
-        np.sin(theta) * np.sin(phi),
-        np.sin(theta) * np.cos(phi),
-        np.cos(theta)], dtype=float)
+    return np.array(
+        [np.sin(theta) * np.sin(phi), np.sin(theta) * np.cos(phi), np.cos(theta)],
+        dtype=float,
+    )
+
 
 def getDirections(phi_array, theta_array):
     directions = np.zeros([phi_array.shape[0], theta_array.shape[0], 3])
@@ -14,12 +16,13 @@ def getDirections(phi_array, theta_array):
 
     return directions
 
+
 def getPhiTheta(direction):
     norm = np.linalg.norm(direction)
 
     if norm == 0:
-        print('[ERROR][direction::getParam]')
-        print('\t direction is 0 vector!')
+        print("[ERROR][direction::getParam]")
+        print("\t direction is 0 vector!")
         return None, None
 
     norm_direction = np.array(direction) / norm
@@ -36,19 +39,20 @@ def getPhiTheta(direction):
 
     return phi, theta
 
+
 def getPhisThetas(directions):
     norm = np.linalg.norm(directions, axis=1)
 
-    valid_mask = (norm > 0) & (directions[:, 2] != 1.0)
+    valid_mask = (norm > 0) & (abs(directions[:, 2]) != 1.0)
 
     valid_norm = norm[valid_mask]
 
-    valid_norm = np.vstack([valid_norm, valid_norm, valid_norm]).transpose(1, 0)
-
     norm_directions = np.zeros_like(directions, dtype=float)
-    norm_directions[:, 2] = 1.0
+    norm_directions[:, 2] = directions[:, 2]
 
-    norm_directions[valid_mask] = directions[valid_mask] / valid_norm
+    norm_directions[valid_mask] = directions[valid_mask] / np.tile(
+        valid_norm, (3, 1)
+    ).transpose(1, 0)
 
     thetas = np.arccos(norm_directions[:, 2])
 
@@ -58,7 +62,8 @@ def getPhisThetas(directions):
 
     phis[valid_mask] = np.arctan2(
         norm_directions[valid_mask][:, 0] / sin_thetas,
-        norm_directions[valid_mask][:, 1] / sin_thetas)
+        norm_directions[valid_mask][:, 1] / sin_thetas,
+    )
 
     add_idx = phis < 0
 
