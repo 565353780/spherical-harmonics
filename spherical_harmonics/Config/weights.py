@@ -1,8 +1,6 @@
 import numpy as np
 
-W0 = [
-    0.5 * np.sqrt(1.0 / np.pi)
-]
+W0 = [0.5 * np.sqrt(1.0 / np.pi)]
 
 W1 = [
     0.5 * np.sqrt(1.5 / np.pi),
