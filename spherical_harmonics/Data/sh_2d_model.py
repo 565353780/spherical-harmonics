@@ -11,8 +11,11 @@ from spherical_harmonics.Method.values_2d import getSH2DValues, getSH2DModelValu
 from spherical_harmonics.Method.params import get2DParams
 from spherical_harmonics.Data.sh_base_model import SHBaseModel
 
+
 class SH2DModel(SHBaseModel):
-    def __init__(self, degree_max: int=0, method_name: str='numpy', dtype=None) -> None:
+    def __init__(
+        self, degree_max: int = 0, method_name: str = "numpy", dtype=None
+    ) -> None:
         SHBaseModel.__init__(self, degree_max, method_name, dtype)
         return
 
@@ -28,28 +31,46 @@ class SH2DModel(SHBaseModel):
         return self.degree_max == DEGREE_MAX_2D
 
     def updateParams(self) -> bool:
-        self.params = get2DParams(self.degree_max, self.params, self.method_name, self.dtype)
+        self.params = get2DParams(
+            self.degree_max, self.params, self.method_name, self.dtype
+        )
         return True
 
     def getValue(self, phis):
-        return getSH2DModelValue(self.degree_max, phis, self.params, self.method_name, self.dtype)
+        return getSH2DModelValue(
+            self.degree_max, phis, self.params, self.method_name, self.dtype
+        )
 
-    def solveParams(self, phis: Union[list, np.ndarray], dists: Union[list, np.ndarray]) -> bool:
-        values = np.array(getSH2DValues(self.degree_max, phis, 'numpy', np.float64)).transpose(1, 0)
+    def solveParams(
+        self, phis: Union[list, np.ndarray], dists: Union[list, np.ndarray]
+    ) -> bool:
+        values = np.array(
+            getSH2DValues(self.degree_max, phis, "numpy", np.float64)
+        ).transpose(1, 0)
         return SHBaseModel.solveParams(self, values, dists)
 
-    def getDiffValues(self, phis: Union[list, np.ndarray, torch.Tensor, jt.Var],
-                      method_name: str='torch', dtype=None) -> Union[list, np.ndarray, torch.Tensor, jt.Var]:
-        return getSH2DModelValue(self.degree_max, phis, toData(self.params, method_name, dtype), method_name, dtype)
+    def getDiffValues(
+        self,
+        phis: Union[list, np.ndarray, torch.Tensor, jt.Var],
+        method_name: str = "torch",
+        dtype=None,
+    ) -> Union[list, np.ndarray, torch.Tensor, jt.Var]:
+        return getSH2DModelValue(
+            self.degree_max,
+            phis,
+            toData(self.params, method_name, dtype),
+            method_name,
+            dtype,
+        )
 
     def render(self):
         params = self.params
-        if self.method_name in ['torch', 'jittor']:
+        if self.method_name in ["torch", "jittor"]:
             params = self.params.detach().cpu()
 
         if not renderSH2DModelCurve(self.degree_max, params, self.method_name):
-            print('[ERROR][SHModel::render]')
-            print('\t renderSH2DModelCurve failed!')
+            print("[ERROR][SHModel::render]")
+            print("\t renderSH2DModelCurve failed!")
             return False
 
         return True
