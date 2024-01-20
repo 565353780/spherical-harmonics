@@ -3,7 +3,7 @@ import numpy as np
 
 def getDirection(phi, theta):
     return np.array(
-        [np.sin(theta) * np.sin(phi), np.sin(theta) * np.cos(phi), np.cos(theta)],
+        [np.sin(theta) * np.cos(phi), np.sin(theta) * np.sin(phi), np.cos(theta)],
         dtype=float,
     )
 
@@ -33,7 +33,7 @@ def getPhiTheta(direction):
     if sin_theta == 0:
         return 0, theta
 
-    phi = np.arctan2(norm_direction[0] / sin_theta, norm_direction[1] / sin_theta)
+    phi = np.arctan2(norm_direction[1] / sin_theta, norm_direction[0] / sin_theta)
     if phi < 0:
         phi += 2.0 * np.pi
 
@@ -61,8 +61,8 @@ def getPhisThetas(directions):
     phis = np.zeros_like(thetas, dtype=float)
 
     phis[valid_mask] = np.arctan2(
-        norm_directions[valid_mask][:, 0] / sin_thetas,
         norm_directions[valid_mask][:, 1] / sin_thetas,
+        norm_directions[valid_mask][:, 0] / sin_thetas,
     )
 
     add_idx = phis < 0
